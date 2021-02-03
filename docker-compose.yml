@@ -1,16 +1,16 @@
 version: "3"
 services:
   db:
-    image: mysql
+    image: mysql:5.7.24
     env_file: .env
-    volumes:
-      - db_data:/var/lib/mysql
+    # volumes:
+    #   - db_data:/var/lib/mysql
   redis:
     image: redis:5.0.1
   sidekiq:
     build: .
     env_file: .env
-    command: sidekiq -C config/sidekiq.yml -L log/sidekiq.log
+    command: bundle exec sidekiq -C config/sidekiq.yml
     volumes:
       - .:/myapp
     depends_on:
@@ -18,7 +18,7 @@ services:
   web:
     build: .
     env_file: .env
-    entrypoint: entrypoint.sh
+    entrypoint: lib/entrypoint.sh
     volumes:
       - .:/myapp
     ports:

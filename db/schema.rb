@@ -12,40 +12,32 @@
 
 ActiveRecord::Schema.define(version: 2021_02_03_151734) do
 
-  create_table "comments", force: :cascade do |t|
+  create_table "comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.text "body"
-    t.integer "user_id", null: false
-    t.integer "post_id", null: false
+    t.bigint "user_id", null: false
+    t.bigint "post_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["post_id"], name: "index_comments_on_post_id"
     t.index ["user_id"], name: "index_comments_on_user_id"
   end
 
-  create_table "posts", force: :cascade do |t|
+  create_table "posts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "title"
     t.text "body"
-    t.integer "user_id", null: false
-    t.integer "tags_id", null: false
-    t.integer "comments_id", null: false
+    t.bigint "user_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["comments_id"], name: "index_posts_on_comments_id"
-    t.index ["tags_id"], name: "index_posts_on_tags_id"
     t.index ["user_id"], name: "index_posts_on_user_id"
   end
 
-  create_table "tags", force: :cascade do |t|
+  create_table "tags", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "body"
-    t.integer "user_id", null: false
-    t.integer "post_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["post_id"], name: "index_tags_on_post_id"
-    t.index ["user_id"], name: "index_tags_on_user_id"
   end
 
-  create_table "users", force: :cascade do |t|
+  create_table "users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "username"
     t.string "email"
     t.string "password_digest"
@@ -58,9 +50,5 @@ ActiveRecord::Schema.define(version: 2021_02_03_151734) do
 
   add_foreign_key "comments", "posts"
   add_foreign_key "comments", "users"
-  add_foreign_key "posts", "comments", column: "comments_id"
-  add_foreign_key "posts", "tags", column: "tags_id"
   add_foreign_key "posts", "users"
-  add_foreign_key "tags", "posts"
-  add_foreign_key "tags", "users"
 end
