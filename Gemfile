@@ -38,6 +38,12 @@ group :development do
   gem 'faker'
 end
 
+# gem to use the has_secure_password method
+gem 'bcrypt'
+
+# gem for jwt authentication
+gem 'jwt'
+
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
