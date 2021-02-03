@@ -17,6 +17,7 @@ module Api
         #TODO create new tags first then associate them with the current post
         post = @current_user.posts.new(post_params)
         if (post.save)
+          DeleteOldPostsJob.perform_in(24.hours.from_now,post.id)
           render json: {status: 'SUCCESS', message:'saved post', data:post},status: :ok
         else
           render json: {status: 'ERROR', message:'Post not saved', data:post.errors},status: :unprocessable_entity
