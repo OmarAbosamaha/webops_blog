@@ -3,17 +3,13 @@
 class Auth
 
   ALGORITHM = 'HS256'
+  AUTH_SECRET = ENV.fetch("AUTH_SECRET") { 'defaultsecret' }
 
   def self.issue(payload)
-    JWT.encode(payload,auth_secret,ALGORITHM)
+    JWT.encode(payload, AUTH_SECRET, ALGORITHM)
   end
 
   def self.decode(token)
-    JWT.decode(token,auth_secret,true, {algorithm: ALGORITHM} ).first
-  end
-
-
-  def auth_secret
-    ENV.fetch("AUTH_SECRET")
+    JWT.decode(token, AUTH_SECRET, true, {algorithm: ALGORITHM} ).first
   end
 end

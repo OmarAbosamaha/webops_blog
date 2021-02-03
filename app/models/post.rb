@@ -4,8 +4,6 @@ class Post < ApplicationRecord
   has_many :comments
 
   accepts_nested_attributes_for :tags
-  validates_associated :user
-  validates_associated :tag
   validates :title, presence: true
   validates :body, presence: true
 end

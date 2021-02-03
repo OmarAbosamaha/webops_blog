@@ -21,6 +21,8 @@ services:
     entrypoint: lib/entrypoint.sh
     volumes:
       - .:/myapp
+    tty: true
+    stdin_open: true
     ports:
       - 3000:3000
     depends_on:

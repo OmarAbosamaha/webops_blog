@@ -3,9 +3,14 @@ module Api
     class TagsController < ApplicationController
       before_action :set_post
 
+      def index
+        tags = Tag.order('created_at DESC');
+        render json: {status: 'SUCCESS', message:'Loaded tags', data:tags},status: :ok
+      end
+
       def update
         tag = @post.tags.find(params[:id])
-        if tags.update_attributes(tag_params)
+        if tag.update_attributes(tag_params)
           render json: {status: 'SUCCESS', message:'Updated tag', data:tag},status: :ok
         else
           render json: {status: 'ERROR', message:'Tag not updated', data:tag.errors},status: :unprocessable_entity
@@ -18,7 +23,7 @@ module Api
         end
 
         def set_post
-          @post = Post.find(params[:post_id])
+          @post = @current_user.posts.find(params[:post_id])
         end
     end
   end
