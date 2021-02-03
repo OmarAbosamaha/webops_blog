@@ -1,19 +1,19 @@
-module API
+module Api
   module V1
-    class PostsController < ApplicationRecord
-
+    class CommentsController < ApplicationController
+      before_action :set_post
       def index
-        comments = Comment.order('created_at DESC');
+        comments = @post.comments.order('created_at DESC');
         render json: {status: 'SUCCESS', message:'Loaded comments', data:comments},status: :ok
       end
 
       def show
-        comment = Comment.find(params[:id])
+        comment = @post.comments.find(params[:id])
         render json: {status: 'SUCCESS', message:'Loaded comment', data:comment},status: :ok
       end
 
       def create
-        comment = current_user.comments.new(comment_params)
+        comment = current_user.comments.new(comment_params.merge(post_id: @post.id))
         if (comment.save)
           render json: {status: 'SUCCESS', message:'saved comment', data:comment},status: :ok
         else
@@ -38,9 +38,12 @@ module API
 
       private
         def comment_params
-          params.require(:comment).permit(:body, post_attributes: [:post_id])
+          params.require(:comment).permit(:body)
         end
-      end
+
+        def set_post
+          @post = Post.find(params[:post_id])
+        end
     end
   end
 end

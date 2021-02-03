@@ -1,10 +1,11 @@
-module API
+module Api
   module V1
-    class SessionsController < ApplicationRecord
+
+    class RegistrationsController < ApplicationController
       skip_before_action :authenticate
 
       def create
-        user = user.new(user_params)
+        user = User.new(user_params)
         if user.save
           render json: {status: 'SUCCESS', message:'User created', data:user},status: :ok
         else
@@ -12,12 +13,10 @@ module API
         end
       end
 
-  private
-    def user_params
-      params.require(:user).permit(:username, :email, :password)
+      private
+      def user_params
+        params.require(:user).permit(:username, :email, :password, :image)
+      end
     end
-
-
-    end
-
+  end
 end

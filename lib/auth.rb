@@ -11,10 +11,7 @@ class Auth
   end
 
   def self.decode(token)
-    JWT.decode(token,
-      Auth_secret,
-      true,
-      { algorithm: ALGORITHM }).first
+    JWT.decode(token,Auth_secret,true, {algorithm: ALGORITHM} ).first
   end
 
 #TODO take salt from env

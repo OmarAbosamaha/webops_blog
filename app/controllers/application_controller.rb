@@ -5,6 +5,7 @@ class ApplicationController < ActionController::API
       current_user.present?
     end
 
+
     def current_user
       if auth_present?
         user = User.find(auth["user"])
@@ -14,26 +15,21 @@ class ApplicationController < ActionController::API
       end
     end
 
-    def authenticate
-      render json: {error: "unauthorized"}, status: 401
-        unless logged_in?
+    private
+    
+    def auth_present?
+      request.env.fetch("HTTP_AUTHORIZATION","").scan(/Bearer/).flatten.first.present?
     end
 
-    private
+    def authenticate
+      render json: {error: "unauthorized"}, status: 401 unless logged_in?
+    end
 
-      def token
-        request.env["HTTP_AUTHORIZATION"].scan(/Bearer
-          (.*)$/).flatten.last
-      end
+    def token
+      request.env["HTTP_AUTHORIZATION"].scan(/Bearer(.*)$/).flatten.last
+    end
 
-      def auth
-        Auth.decode(token)
-      end
-
-      def auth_present?
-        !!request.env.fetch("HTTP_AUTHORIZATION",
-          "").scan(/Bearer/).flatten.first
-      end
-
-  end
+    def auth
+      Auth.decode(token)
+    end
 end

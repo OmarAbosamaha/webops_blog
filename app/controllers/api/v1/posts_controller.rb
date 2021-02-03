@@ -1,6 +1,7 @@
-module API
+module Api
   module V1
-    class PostsController < ApplicationRecord
+    class PostsController < ApplicationController
+
 
       def index
         posts = Post.order('created_at DESC');
@@ -13,7 +14,8 @@ module API
       end
 
       def create
-        post = current_user.posts.new(post_params)
+        #TODO create new tags first then associate them with the current post
+        post = @current_user.posts.new(post_params)
         if (post.save)
           render json: {status: 'SUCCESS', message:'saved post', data:post},status: :ok
         else
@@ -22,13 +24,14 @@ module API
       end
 
       def destroy
-        post = current_user.posts.find (params[:id])
+        post = @current_user.posts.find (params[:id])
+        post.comments.destroy
         post.destroy
         render json: {status: 'SUCCESS', message:'Deleted post', data:post},status: :ok
       end
 
       def update
-        post = current_user.posts.find(params[:id])
+        post = @current_user.posts.find(params[:id])
         if post.update_attributes(post_params)
           render json: {status: 'SUCCESS', message:'Updated post', data:post},status: :ok
         else
@@ -37,10 +40,11 @@ module API
       end
 
       private
-        def post_params
-          params.require(:post).permit(:title, :body, :tags_id)
-        end
+
+      def post_params
+        params.require(:post).permit(:title, :body, tags_attributes:[:body =>[]])
       end
+
     end
   end
 end

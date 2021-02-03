@@ -1,6 +1,6 @@
-module API
+module Api
   module V1
-    class SessionsController < ApplicationRecord
+    class SessionsController < ApplicationController
       skip_before_action :authenticate
 
       def create
