@@ -5,5 +5,5 @@ class Comment < ApplicationRecord
   # accepts_nested_attributes_for :post
   validates_associated :user
   validates_associated :post
-  validates :body, presence: true
+  validates :body, presence: true, :allow_blank => false
 end

@@ -14,7 +14,7 @@ module Api
 
       def create
         comment = current_user.comments.new(comment_params.merge(post_id: @post.id))
-        if (comment.save)
+        if comment.save
           render json: {status: 'SUCCESS', message:'saved comment', data:comment},status: :ok
         else
           render json: {status: 'ERROR', message:'Comment not saved', data:comment.errors},status: :unprocessable_entity
