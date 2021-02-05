@@ -9,8 +9,10 @@
 
 class Post < ApplicationRecord
   belongs_to :user
-  has_and_belongs_to_many :tags
-  has_many :comments
+  # has_and_belongs_to_many :tags
+  has_many :comments, dependent: :destroy
+  has_many :post_tags, dependent: :destroy
+  has_many :tags, :through => :post_tags
 
   accepts_nested_attributes_for :tags
   validates :title, presence: true, :allow_blank => false

@@ -1,6 +1,7 @@
 module Api
   module V1
     class PostsController < ApplicationController
+      before_action :set_post, only: %i(destroy update)
 
       def index
         posts = Post.order('created_at DESC');
@@ -13,41 +14,49 @@ module Api
       end
 
       def create
-        post = @current_user.posts.new(post_params)
-        #make sure we have at least one tag in body
+        post = @current_user.posts.new(post_params.except(:tags_attributes))
         if post_params.has_key?(:tags_attributes)
-          byebug
-          if post.save
-            DeleteOldPostsJob.perform_later(24.hours.from_now,post.id)
-            render json: {status: 'SUCCESS', message:'saved post', data:post},status: :ok
-          else
-            render json: {status: 'ERROR', message:'Post not saved', data:post.errors},status: :unprocessable_entity
+          ActiveRecord::Base.transaction do
+            if post.save!
+              assign_tags(post)
+              DeleteOldPostsJob.perform_later(24.hours.from_now,post.id)
+              render json: { status: 'SUCCESS', message:'saved post', data:post }, status: :ok
+            else
+              render json: { status: 'ERROR', message:'Post not saved', data: post.errors }, status: :unprocessable_entity
+            end
           end
         else
-          render json: {status: 'ERROR', message:'Post must have at least one tag', data:post.errors},status: :unprocessable_entity
+          render json: {status: 'ERROR', message:'Post must have at least one tag', data:post.errors}, status: :unprocessable_entity
         end
       end
 
       def destroy
-        post = @current_user.posts.find (params[:id])
-        post.comments.destroy
-        post.destroy
-        render json: {status: 'SUCCESS', message:'Deleted post', data:post},status: :ok
+        @post.destroy
       end
 
       def update
-        post = @current_user.posts.find(params[:id])
-        if post.update_attributes(post_params)
-          render json: {status: 'SUCCESS', message:'Updated post', data:post},status: :ok
+        if @post.update(post_params)
+          render json: {status: 'SUCCESS', message:'Updated post', data:@post},status: :ok
         else
-          render json: {status: 'ERROR', message:'Post not updated', data:post.errors},status: :unprocessable_entity
+          render json: {status: 'ERROR', message:'Post not updated', data:@post.errors},status: :unprocessable_entity
         end
       end
 
       private
 
+      def set_post
+        @post = @current_user.posts.find(params[:id])
+      end
+
       def post_params
         params.require(:post).permit(:title, :body, tags_attributes: [:body])
+      end
+
+      def assign_tags(post)
+        post_params[:tags_attributes].each do |tag_params|
+          tag = Tag.find_or_create_by!(body: tag_params[:body])
+          post.post_tags.find_or_create_by!(tag_id: tag.id)
+        end
       end
 
     end

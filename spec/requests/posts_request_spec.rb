@@ -10,20 +10,9 @@ post_params =  {
   context 'User handling his posts' do
       let (:user) {create(:user)}
       let (:user2) {create(:user)}
-      it 'should save new post' do
-        jwt = Auth.issue({user: user.id})
-        headers = { "ACCEPT" => "application/json", 'Authorization': "Bearer #{jwt}"}
-        post '/api/v1/posts', :params => {post:{
-          title: 'title',
-          body: 'body',
-          tags_attributes: [{body: 'tag'}]
-          }}, :headers => headers
-        expect(response.status).to eq(200)
-      end
+      let(:post) { create(:post, post_params.merge(user: user))}
 
       it 'user should update his own post' do
-        post = user.posts.new(post_params)
-        post.save
         jwt = Auth.issue({user: user.id})
         headers = { "ACCEPT" => "application/json", 'Authorization': "Bearer #{jwt}"}
         put "/api/v1/posts/#{post.id}", :params => {post:{body: 'updated body'}}, :headers => headers
@@ -31,8 +20,6 @@ post_params =  {
       end
 
       it 'user should delete his own post' do
-        post = user.posts.new(post_params)
-        post.save
         before_count = Post.count
         jwt = Auth.issue({user: user.id})
         headers = { "ACCEPT" => "application/json", 'Authorization': "Bearer #{jwt}"}
@@ -41,8 +28,6 @@ post_params =  {
       end
 
       it 'user should not delete a post that is not his' do
-        post = user.posts.new(post_params)
-        post.save
         before_count = Post.count
         jwt = Auth.issue({user: user2.id})
         headers = { "ACCEPT" => "application/json", 'Authorization': "Bearer #{jwt}"}
@@ -51,8 +36,6 @@ post_params =  {
       end
 
       it 'user should not update a post that is not his' do
-        post = user.posts.new(post_params)
-        post.save
         jwt = Auth.issue({user: user2.id})
         headers = { "ACCEPT" => "application/json", 'Authorization': "Bearer #{jwt}"}
         put "/api/v1/posts/#{post.id}", :params => {post:{body: 'updated body'}}, :headers => headers
