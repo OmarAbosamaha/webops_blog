@@ -7,7 +7,7 @@ post_params =  {
   body: 'body',
   tags_attributes: [{body: 'tag'}]
   }
-  context 'Put #update and #delete' do
+  context 'User handling his posts' do
       let (:user) {create(:user)}
       let (:user2) {create(:user)}
       it 'user should update his own post' do
