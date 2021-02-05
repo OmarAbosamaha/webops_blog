@@ -20,33 +20,37 @@ RSpec.describe "Comments", type: :request do
       #user making a post
       post = user.posts.new(post_params)
       post.save
+      before_count = Comment.count
       jwt = Auth.issue({user: user2.id})
       headers = { "ACCEPT" => "application/json", 'Authorization': "Bearer #{jwt}"}
       # another user commenting
       post "/api/v1/posts/#{post.id}/comments", :params => comment_params, :headers => headers
-      expect(response.status).to eq(200)
+      expect(Comment.count).to eq(before_count+1)
     end
 
     it 'should update a comment' do
-      # #user making a post and commenting on it
-      # post = user.posts.new(post_params)
-      # post.save
-      # comment = user.comments.new({body: 'comment body', post_id: post.id})
-      # jwt = Auth.issue({user: user.id})
-      # headers = { "ACCEPT" => "application/json", 'Authorization': "Bearer #{jwt}"}
-      # put "/api/v1/posts/#{post.id}/comments/#{comment.id}", :params => {comment:{body: 'updated comment body'}}, :headers => headers
-      # expect(response.status).to eq(200)
+      #user making a post and commenting on it
+      post = user.posts.new(post_params)
+      post.save
+      comment = user.comments.new({body: 'comment body', post_id: post.id})
+      comment.save
+      jwt = Auth.issue({user: user.id})
+      headers = { "ACCEPT" => "application/json", 'Authorization': "Bearer #{jwt}"}
+      put "/api/v1/posts/#{post.id}/comments/#{comment.id}", :params => {comment:{body: 'updated comment body'}}, :headers => headers
+      expect(response.status).to eq(200)
     end
 
     it 'user can delete their comment' do
-      # #user making a post and commenting on it
-      # post = user.posts.new(post_params)
-      # post.save
-      # comment = user.comments.new({body: 'comment body', post_id: post.id})
-      # jwt = Auth.issue({user: user.id})
-      # headers = { "ACCEPT" => "application/json", 'Authorization': "Bearer #{jwt}"}
-      # delete "/api/v1/posts/#{post.id}/comments/#{comment.id}", :headers => headers
-      # expect(response.status).to eq(200)
+      #user making a post and commenting on it
+      post = user.posts.new(post_params)
+      post.save
+      comment = user.comments.new({body: 'comment body', post_id: post.id})
+      comment.save
+      before_count = Comment.count
+      jwt = Auth.issue({user: user.id})
+      headers = { "ACCEPT" => "application/json", 'Authorization': "Bearer #{jwt}"}
+      delete "/api/v1/posts/#{post.id}/comments/#{comment.id}", :headers => headers
+      expect(Comment.count).to eq(before_count-1)
     end
   end
 end

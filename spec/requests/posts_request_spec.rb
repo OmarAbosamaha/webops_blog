@@ -22,19 +22,21 @@ post_params =  {
       it 'user should delete his own post' do
         post = user.posts.new(post_params)
         post.save
+        before_count = Post.count
         jwt = Auth.issue({user: user.id})
         headers = { "ACCEPT" => "application/json", 'Authorization': "Bearer #{jwt}"}
         delete "/api/v1/posts/#{post.id}", :headers => headers
-        expect(response.status).to eq(200)
+        expect(Post.count).to eq(before_count-1)
       end
 
       it 'user should not delete a post that is not his' do
         post = user.posts.new(post_params)
         post.save
+        before_count = Post.count
         jwt = Auth.issue({user: user2.id})
         headers = { "ACCEPT" => "application/json", 'Authorization': "Bearer #{jwt}"}
         delete "/api/v1/posts/#{post.id}", :headers => headers
-        expect(response.status).to eq(404)
+        expect(Post.count).to eq(before_count)
       end
 
       it 'user should not update a post that is not his' do

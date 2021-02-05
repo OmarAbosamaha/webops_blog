@@ -29,7 +29,7 @@ module Api
 
       def update
         comment = current_user.comments.find(params[:id])
-        if comments.update_attributes(comment_params)
+        if comment.update_attributes(comment_params)
           render json: {status: 'SUCCESS', message:'Updated comment', data:comment},status: :ok
         else
           render json: {status: 'ERROR', message:'Comment not updated', data:comment.errors},status: :unprocessable_entity
