@@ -9,6 +9,7 @@ post_params =  {
   }
   context 'Put #update and #delete' do
       let (:user) {create(:user)}
+      let (:user2) {create(:user)}
       it 'user should update his own post' do
         post = user.posts.new(post_params)
         post.save
@@ -25,6 +26,24 @@ post_params =  {
         headers = { "ACCEPT" => "application/json", 'Authorization': "Bearer #{jwt}"}
         delete "/api/v1/posts/#{post.id}", :headers => headers
         expect(response.status).to eq(200)
-    end
+      end
+
+      it 'user should not delete a post that is not his' do
+        post = user.posts.new(post_params)
+        post.save
+        jwt = Auth.issue({user: user2.id})
+        headers = { "ACCEPT" => "application/json", 'Authorization': "Bearer #{jwt}"}
+        delete "/api/v1/posts/#{post.id}", :headers => headers
+        expect(response.status).to eq(404)
+      end
+
+      it 'user should not update a post that is not his' do
+        post = user.posts.new(post_params)
+        post.save
+        jwt = Auth.issue({user: user2.id})
+        headers = { "ACCEPT" => "application/json", 'Authorization': "Bearer #{jwt}"}
+        put "/api/v1/posts/#{post.id}", :params => {post:{body: 'updated body'}}, :headers => headers
+        expect(response.status).to eq(404)
+      end
   end
 end
