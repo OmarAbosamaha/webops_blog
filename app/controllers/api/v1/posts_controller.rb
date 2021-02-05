@@ -16,6 +16,7 @@ module Api
         post = @current_user.posts.new(post_params)
         #make sure we have at least one tag in body
         if post_params.has_key?(:tags_attributes)
+          byebug
           if post.save
             DeleteOldPostsJob.perform_later(24.hours.from_now,post.id)
             render json: {status: 'SUCCESS', message:'saved post', data:post},status: :ok

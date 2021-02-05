@@ -5,8 +5,10 @@ services:
     env_file: .env
     # volumes:
     #   - db_data:/var/lib/mysql
+
   redis:
     image: redis:5.0.1
+
   sidekiq:
     build: .
     env_file: .env
@@ -15,6 +17,7 @@ services:
       - .:/myapp
     depends_on:
       - db
+
   web:
     build: .
     env_file: .env
@@ -27,5 +30,6 @@ services:
       - 3000:3000
     depends_on:
       - db
+
 volumes:
     db_data:
